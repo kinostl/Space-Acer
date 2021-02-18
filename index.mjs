@@ -130,6 +130,18 @@ ${eventTypeRoll.map((o) => episodeEvents[o]()).join('\n')}`
   }
 }
 
+function getAIHelp (likelihood) {
+  const riskFactor = {
+    likely: 5,
+    possibly: 10,
+    unlikely: 15
+  }[likelihood]
+  const riskRoll = _.random(1, 20)
+  const riskResult = riskRoll > riskFactor ? 'Yes' : 'No'
+  const bonusResult = _.sample([' but...', '', ' and...'])
+  return `${riskResult}${bonusResult}`
+}
+
 const commands = {}
 commands.start = async (msg) => {
   const guild = msg.guild
@@ -154,6 +166,10 @@ commands.encounter = async (msg) => { await msg.reply(generateEpisodeEvent('enco
 commands.difficulty = async (msg) => { await msg.reply(generateEpisodeEvent('difficulty')) }
 commands.complex = async (msg) => { await msg.reply(generateEpisodeEvent('complex')) }
 commands.flavor = async (msg) => { await msg.reply(generateEpisodeEvent('flavor')) }
+
+commands.likely = async (msg) => { await msg.reply(getAIHelp('likely')) }
+commands.possibly = async (msg) => { await msg.reply(getAIHelp('possibly')) }
+commands.unlikely = async (msg) => { await msg.reply(getAIHelp('unlikely')) }
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`)
