@@ -138,7 +138,7 @@ function getAIHelp (likelihood) {
   }[likelihood]
   const riskRoll = _.random(1, 20)
   const riskResult = riskRoll > riskFactor ? 'Yes' : 'No'
-  const bonusResult = _.sample([' but...', '', ' and...'])
+  const bonusResult = _.sample([', but...', '', ', and...'])
   return `${riskResult}${bonusResult}`
 }
 
