@@ -76,8 +76,7 @@ function generateMission () {
 **The Objective** ${_.sample(objective)}
 **The Location** ${_.sample(location)}
 **Location Aspect** ${_.sample(locationAspect)}
-**The Opposition** ${_.sample(opposition)}
-**Their Agenda** ${_.sample(theirAgenda)}
+**The Opposition** ${_.sample(opposition)} **Their Agenda** ${_.sample(theirAgenda)}
 **The Snag** ${_.sample(theSnag)}`
 }
 
