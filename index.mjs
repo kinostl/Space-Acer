@@ -175,7 +175,8 @@ ${msg.author} - When you're done, use \`!archive\` to clean up this category!
 }
 
 commands.archive = async (msg) => {
-  const channelInfo = channelSafety[msg.channel.parentID]
+  const parentID = msg.channel.parentID
+  const channelInfo = channelSafety[parentID]
   if(!channelInfo) return
   if(channelInfo.creator !== msg.author.id) return
   const missionData = await client.channels.fetch(channelInfo.missionId)
@@ -188,6 +189,8 @@ commands.archive = async (msg) => {
     let channel = await client.channels.fetch(o)
     await channel.delete()
   }
+  delete channelSafety[parentID]
+  await writeFile(channelSafetyPath, channelSafety)
 }
 
 commands.event = async (msg) => { await msg.reply(generateEpisodeEvent()) }
