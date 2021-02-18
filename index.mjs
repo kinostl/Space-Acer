@@ -155,7 +155,8 @@ commands.start = async (msg) => {
   const voiceChat = await guild.channels.create('voice-chat', { type: 'voice', parent: newCategory })
   channelSafety[newCategory.id] = {
     creator: msg.author.id,
-    channels: [newCategory.id, missionData.id, voiceText.id, botUse.id, voiceChat.id]
+    missionId: missionData.id,
+    channels: [newCategory.id, voiceText.id, botUse.id, voiceChat.id]
   }
   const saveChannelSafety = writeFile(channelSafetyPath, channelSafety)
   const mission = generateMission()
@@ -165,9 +166,28 @@ You should ping your players and start interpreting the mission parameters!
 Make a three step plan, use the \`!event\` command to make some Episode Events to fit in between those steps!
 Finally, use \`!difficulty\` to start ‘in medias res’ and you’ve got the adventure! 
 
-When in doubt, Ask the AI with \`!likely\`, \`!possibly\`, or \`!unlikely\``)
+When in doubt, Ask the AI with \`!likely\`, \`!possibly\`, or \`!unlikely\`
+
+${msg.author} - When you're done, use \`!archive\` to clean up this category!
+**Mission Data is the only channel that will be preserved**`)
   await msg.delete()
   await saveChannelSafety
+}
+
+commands.archive = async (msg) => {
+  const channelInfo = channelSafety[msg.channel.parentID]
+  if(!channelInfo) return
+  if(channelInfo.creator !== msg.author.id) return
+  const missionData = await client.channels.fetch(channelInfo.missionId)
+  const archiveCategory = await msg.guild.channels.cache.find(channel => channel.name === "archives" && channel.type === "category");
+  await missionData.edit({
+    name: msg.channel.parent.name,
+    parentID: archiveCategory.id
+  })
+  for(let o of channelInfo.channels){
+    let channel = await client.channels.fetch(o)
+    await channel.delete()
+  }
 }
 
 commands.event = async (msg) => { await msg.reply(generateEpisodeEvent()) }
