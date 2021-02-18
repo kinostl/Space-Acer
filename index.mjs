@@ -1,9 +1,12 @@
 import Discord from 'discord.js'
+import { writeFile, readFile } from 'node-serialization'
 import _ from 'lodash'
 import { customAlphabet } from 'nanoid/async'
 const client = new Discord.Client()
 const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
 const nanoid = customAlphabet(alphabet, 9)
+const channelSafetyPath = 'channelSafety.bs'
+const channelSafety = await readFile(channelSafetyPath)
 
 function generateMission () {
   const faction = [
@@ -145,17 +148,26 @@ const commands = {}
 commands.start = async (msg) => {
   const guild = msg.guild
   const channelId = await nanoid()
-  const newChannel = await guild.channels.create(channelId)
-  await guild.channels.create(channelId, { type: 'voice' })
+  const newCategory = await guild.channels.create(channelId, { type: 'category' })
+  const missionData = await guild.channels.create('mission-data', { parent: newCategory })
+  const voiceText = await guild.channels.create('voice-text', { parent: newCategory })
+  const botUse = await guild.channels.create('bot-use', { parent: newCategory })
+  const voiceChat = await guild.channels.create('voice-chat', { type: 'voice', parent: newCategory })
+  channelSafety[newCategory.id] = {
+    creator: msg.author.id,
+    channels: [newCategory.id, missionData.id, voiceText.id, botUse.id, voiceChat.id]
+  }
+  const saveChannelSafety = writeFile(channelSafetyPath, channelSafety)
   const mission = generateMission()
-  await newChannel.send(mission)
-  await newChannel.send(`${msg.author} your play rooms have been created!
+  await missionData.send(mission)
+  await missionData.send(`${msg.author} your play rooms have been created!
 You should ping your players and start interpreting the mission parameters!
 Make a three step plan, use the \`!event\` command to make some Episode Events to fit in between those steps!
 Finally, use \`!difficulty\` to start ‘in medias res’ and you’ve got the adventure! 
 
 When in doubt, Ask the AI with \`!likely\`, \`!possibly\`, or \`!unlikely\``)
   await msg.delete()
+  await saveChannelSafety
 }
 
 commands.event = async (msg) => { await msg.reply(generateEpisodeEvent()) }
