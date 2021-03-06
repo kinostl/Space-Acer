@@ -162,6 +162,10 @@ commands.start = async (msg) => {
         id: msg.author.id,
         allow: ['VIEW_CHANNEL'],
       },
+      {
+        id: msg.client.user.id,
+        allow: ['VIEW_CHANNEL'],
+      },
     ],
   })
   const voiceText = await guild.channels.create('voice-text', { parent: newCategory })
