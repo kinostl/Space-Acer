@@ -155,11 +155,11 @@ commands.start = async (msg) => {
   const gameMasterNotes = await guild.channels.create('game-master-notes', { parent: newCategory, 
     permissionOverwrites: [
       {
-        id: message.guild.id,
+        id: msg.guild.id,
         deny: ['VIEW_CHANNEL'],
       },
       {
-        id: message.author.id,
+        id: msg.author.id,
         allow: ['VIEW_CHANNEL'],
       },
     ],
