@@ -150,13 +150,27 @@ commands.start = async (msg) => {
   const channelId = await nanoid()
   const newCategory = await guild.channels.create(channelId, { type: 'category' })
   const missionData = await guild.channels.create('mission-data', { parent: newCategory })
+  const outOfCharacter = await guild.channels.create('out-of-character', { parent: newCategory })
+  const playerNotes = await guild.channels.create('player-notes', { parent: newCategory })
+  const gameMasterNotes = await guild.channels.create('game-master-notes', { parent: newCategory, 
+    permissionOverwrites: [
+      {
+        id: message.guild.id,
+        deny: ['VIEW_CHANNEL'],
+      },
+      {
+        id: message.author.id,
+        allow: ['VIEW_CHANNEL'],
+      },
+    ],
+  })
   const voiceText = await guild.channels.create('voice-text', { parent: newCategory })
   const botUse = await guild.channels.create('bot-use', { parent: newCategory })
   const voiceChat = await guild.channels.create('voice-chat', { type: 'voice', parent: newCategory })
   channelSafety[newCategory.id] = {
     creator: msg.author.id,
     missionId: missionData.id,
-    channels: [newCategory.id, voiceText.id, botUse.id, voiceChat.id]
+    channels: [newCategory.id, voiceText.id, botUse.id, voiceChat.id, outOfCharacter.id, playerNotes.id, gameMasterNotes.id]
   }
   const saveChannelSafety = writeFile(channelSafetyPath, channelSafety)
   const mission = generateMission()
